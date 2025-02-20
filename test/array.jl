@@ -264,6 +264,29 @@ end
     end
 end
 
+@testset "deepcopy of wrapped arrays" begin
+    a = zeros(Float32, 1)
+    a = MtlArray(a)
+
+    b = deepcopy(a)
+    @test !(b === a)
+
+    fill!(b, 1)
+    @test all(a .== 0)
+
+    # Test that deepcopy works for wrapped arrays containing MtlArrays
+    struct TestArray{T, N} <: AbstractArray{T, N}
+        parent :: AbstractArray{T, N}
+    end
+
+    # Wrap Mtlarray
+    c = TestArray(a)
+    d = deepcopy(c)
+
+    c.parent .= 1
+    @test all(d.parent .== 0)
+end
+
 @testset "fill!($T)" for T in [Int8, UInt8, Int16, UInt16, Int32, UInt32, Int64, UInt64,
                                Float16, Float32]
     b = rand(T)
