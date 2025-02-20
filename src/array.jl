@@ -236,6 +236,10 @@ function Base.copy(a::MtlArray)
     @inbounds copyto!(b, a)
 end
 
+function Base.deepcopy_internal(x::MtlArray, dict::IdDict)
+    haskey(dict, x) && return dict[x]::typeof(x)
+    return dict[x] = copy(x)
+end
 
 ## array interface
 
